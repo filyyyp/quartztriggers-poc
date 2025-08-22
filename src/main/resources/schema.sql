@@ -3,15 +3,8 @@ DROP TABLE IF EXISTS product;
 CREATE TABLE IF NOT EXISTS product
 (
     id              BIGSERIAL PRIMARY KEY,
-    name            VARCHAR(255),
+    name            VARCHAR(255) NOT NULL,
+    state           VARCHAR(255) NOT NULL,
     expiration_date TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-
-DROP SEQUENCE IF EXISTS product_seq;
-CREATE SEQUENCE product_seq
-    INCREMENT BY 50
-    START WITH 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
