@@ -11,6 +11,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.model.Product;
 
 import java.util.Date;
@@ -35,6 +36,7 @@ public class ProductExpirationSchedulerService {
         this.productExpirationJobDetail = productExpirationJobDetail;
     }
 
+    @Transactional
     public void scheduleProductsForExpiration()  {
         List<Product> productsWithExpiration = productService.findProductsWithExpiration(60);
         log.info("Found {} products with expiration to schedule", productsWithExpiration.size());
