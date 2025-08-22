@@ -2,6 +2,7 @@ package sk.ujcik.demo.quatz.triggers.quartztriggers.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.model.Product;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.model.ProductState;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.repository.ProductRepository;
@@ -34,6 +35,7 @@ public class ProductService {
         return productRepository.findByExpirationDateLessThanAndState(OffsetDateTime.now().plusSeconds(expirationInSeconds), ProductState.ACTIVE);
     }
 
+    @Transactional
     public void deactivateProduct(long productId) {
         productRepository.findById(productId).ifPresent(product -> {
             product.setState(ProductState.INACTIVE);
