@@ -2,7 +2,6 @@ package sk.ujcik.demo.quatz.triggers.quartztriggers.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.model.Product;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.repository.ProductRepository;
 
@@ -14,7 +13,6 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    @Transactional
     public void generateProducts(int numberOfProducts) {
 
         List<Product> products = new ArrayList<>();
