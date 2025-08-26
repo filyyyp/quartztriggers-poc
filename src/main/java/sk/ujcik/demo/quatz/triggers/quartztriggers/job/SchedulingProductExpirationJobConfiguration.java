@@ -30,7 +30,7 @@ public class SchedulingProductExpirationJobConfiguration {
         return TriggerBuilder.newTrigger().forJob(job)
                 .withIdentity("Qrtz_Trigger")
                 .withDescription("Sample trigger")
-                .startAt(futureDate(5, DateBuilder.IntervalUnit.SECOND))
+                .startAt(futureDate(10, DateBuilder.IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule().repeatForever().withIntervalInSeconds(60))
                 .build();
     }

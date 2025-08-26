@@ -1,19 +1,23 @@
 package sk.ujcik.demo.quatz.triggers.quartztriggers.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.model.Product;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -38,24 +42,47 @@ public class ProductExpirationSchedulerService {
 
     @Transactional
     public void scheduleProductsForExpiration()  {
-        List<Product> productsWithExpiration = productService.findProductsWithExpiration(60);
-        log.info("Found {} products with expiration to schedule", productsWithExpiration.size());
+        int batchSize = 5000;
+        int expirationInSeconds = 60;
+        OffsetDateTime expirationDate = OffsetDateTime.now().plusSeconds(expirationInSeconds);
+        PageRequest pageRequest = PageRequest.of(0, batchSize, Sort.by("id"));
+        Page<Product> productsWithExpiration = productService.findProductsWithExpiration(expirationDate, pageRequest);
+        log.info("==========================================================");
+        log.info("Scheduling {} products for expiration", productsWithExpiration.getTotalElements());
+        log.info("==========================================================");
+        scheduleBatchOfProductsForExpiration(productsWithExpiration.getContent());
 
-        productsWithExpiration.forEach(product -> {
-            Trigger expirationTrigger = TriggerBuilder.newTrigger()
-                    .forJob(productExpirationJobDetail)
-                    .withIdentity("ExpirationJobTrigger" + product.getId())
-                    .withDescription("Trigger for product expiration")
-                    .startAt(Date.from(product.getExpirationDate().toInstant()))
-                    .usingJobData("productId", product.getId())
-                    .build();
-            try {
-                scheduler.scheduleJob(expirationTrigger);
-            } catch (SchedulerException e) {
-                throw new RuntimeException(e);
-            }
+        while (productsWithExpiration.hasNext()) {
+            Pageable pageable = productsWithExpiration.nextPageable();
+            log.info("Getting next page for: {}", pageable);
+            productsWithExpiration = productService.findProductsWithExpiration(expirationDate, pageable);
+            scheduleBatchOfProductsForExpiration(productsWithExpiration.getContent());
+        }
+        log.info("==========================================================");
+        log.info("Scheduled {} products for expiration", productsWithExpiration.getTotalElements());
+        log.info("==========================================================");
+    }
 
-        });
+    private void scheduleBatchOfProductsForExpiration(List<Product> products) {
+        Instant start = Instant.now();
+        log.info("Scheduling batch of {} products for expiration, ids: {}", products.size(), products.stream().map(Product::getId).toList());
+        products.forEach(this::scheduleProductExpiration);
+        log.info("Scheduled batch of {} products for expiration in {} seconds", products.size(), Duration.between(start, Instant.now()).getSeconds());
+    }
 
+    private void scheduleProductExpiration(Product product) {
+        Trigger expirationTrigger = TriggerBuilder.newTrigger()
+                .forJob(productExpirationJobDetail)
+                .withIdentity("ExpirationJobTrigger" + product.getId(), "DEFAULT")
+                .withDescription("Trigger for product expiration")
+                .startAt(Date.from(product.getExpirationDate().toInstant()))
+                .usingJobData("productId", product.getId())
+                .build();
+        try {
+            scheduler.scheduleJob(expirationTrigger);
+        } catch (SchedulerException e) {
+            log.error("Error scheduling product expiration trigger", e);
+            throw new RuntimeException(e);
+        }
     }
 }

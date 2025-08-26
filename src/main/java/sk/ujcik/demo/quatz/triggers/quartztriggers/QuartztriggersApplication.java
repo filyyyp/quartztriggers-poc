@@ -22,9 +22,10 @@ public class QuartztriggersApplication {
     public CommandLineRunner commandLineRunner(ProductService productService) {
         return args -> {
             Thread.sleep(1_000);
-            int numberOfProducts = 10000;
+            int numberOfProducts = 100_000;
+//            int numberOfProducts = 10_000;
             log.info("Generating {} products", numberOfProducts);
-            productService.generateProducts(numberOfProducts, 300);
+            productService.generateProducts(numberOfProducts, 5 * 60);
             log.info("Finished generating of products");
         };
     }

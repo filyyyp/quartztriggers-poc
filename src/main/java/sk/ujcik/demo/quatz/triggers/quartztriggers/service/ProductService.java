@@ -1,6 +1,8 @@
 package sk.ujcik.demo.quatz.triggers.quartztriggers.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.model.Product;
@@ -31,8 +33,12 @@ public class ProductService {
         productRepository.saveAll(products);
     }
 
-    public List<Product> findProductsWithExpiration(int expirationInSeconds) {
-        return productRepository.findByExpirationDateLessThanAndState(OffsetDateTime.now().plusSeconds(expirationInSeconds), ProductState.ACTIVE);
+    public Page<Product> findProductsWithExpiration(OffsetDateTime expirationDate, Pageable pageable) {
+        return productRepository.findByExpirationDateLessThanAndState(
+                expirationDate,
+                ProductState.ACTIVE,
+                pageable
+        );
     }
 
     @Transactional
