@@ -16,20 +16,22 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 @Slf4j
 @Configuration
 public class SchedulingProductExpirationJobConfiguration {
+    public static final String SCHEDULING_PRODUCT_EXPIRATION_JOB_NAME = "SchedulingProductExpirationJob";
 
    @Bean(name = "schedulingProductExpirationJobDetail")
     public JobDetail schedulingProductExpirationJobDetail() {
        return newJob(SchedulingProductExpirationJob.class)
                .storeDurably()
-               .withIdentity("SchedulingProductExpirationJob")
+               .withIdentity(SCHEDULING_PRODUCT_EXPIRATION_JOB_NAME)
+               .withDescription("Job for scheduling product expiration triggers, check for product expiration and if it is expired schedule")
                .build();
    }
 
     @Bean(name = "schedulingProductExpirationTrigger")
     public Trigger trigger(@Qualifier("schedulingProductExpirationJobDetail") JobDetail job) {
         return TriggerBuilder.newTrigger().forJob(job)
-                .withIdentity("Qrtz_Trigger")
-                .withDescription("Sample trigger")
+                .withIdentity("SchedulingProductExpirationTrigger")
+                .withDescription("Trigger for scheduling product expiration, triggers every minute forever")
                 .startAt(futureDate(10, DateBuilder.IntervalUnit.SECOND))
                 .withSchedule(simpleSchedule().repeatForever().withIntervalInSeconds(60))
                 .build();
