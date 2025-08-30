@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static sk.ujcik.demo.quatz.triggers.quartztriggers.job.ProductExpirationJobConfiguration.PRODUCT_EXPIRATION_JOB_NAME;
+import static sk.ujcik.demo.quatz.triggers.quartztriggers.job.ProductExpirationJITJobConfiguration.PRODUCT_EXPIRATION_JIT_JOB_NAME;
 
 @Slf4j
 @Component
@@ -94,7 +94,7 @@ public class QuartzMetrics {
     private List<? extends Trigger> getProductExpirationTriggers() {
         try {
             Instant startTime = Instant.now();
-            List<? extends Trigger> triggersOfJob = scheduler.getTriggersOfJob(JobKey.jobKey(PRODUCT_EXPIRATION_JOB_NAME));
+            List<? extends Trigger> triggersOfJob = scheduler.getTriggersOfJob(JobKey.jobKey(PRODUCT_EXPIRATION_JIT_JOB_NAME));
             log.info("Getting triggers took {} ms, count {}", Duration.between(startTime, Instant.now()).toMillis(), triggersOfJob.size());
             return triggersOfJob;
         } catch (SchedulerException e) {
@@ -105,7 +105,7 @@ public class QuartzMetrics {
 
     private List<QuartzTrigger> getProductExpirationTriggersWithCustomRepository() {
         Instant startTime = Instant.now();
-        List<QuartzTrigger> expiredTriggers = quartzTriggersRepository.findByJobName(PRODUCT_EXPIRATION_JOB_NAME);
+        List<QuartzTrigger> expiredTriggers = quartzTriggersRepository.findByJobName(PRODUCT_EXPIRATION_JIT_JOB_NAME);
         log.info("Custom repo Getting triggers took {} ms, count {}", Duration.between(startTime, Instant.now()).toMillis(), expiredTriggers.size());
         return expiredTriggers;
     }

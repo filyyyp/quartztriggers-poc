@@ -35,7 +35,7 @@ public class ProductExpirationSchedulerService {
     public ProductExpirationSchedulerService(
             ProductService productService,
             Scheduler scheduler,
-            @Qualifier("productExpirationJobDetail")
+            @Qualifier("productExpirationJITJobDetail")
             JobDetail productExpirationJobDetail
     ) {
         this.productService = productService;

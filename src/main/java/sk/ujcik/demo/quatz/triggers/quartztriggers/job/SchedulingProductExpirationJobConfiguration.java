@@ -31,8 +31,12 @@ public class SchedulingProductExpirationJobConfiguration {
     @Bean(name = "schedulingProductExpirationTrigger")
     public Trigger trigger(
             @Qualifier("schedulingProductExpirationJobDetail") JobDetail job,
-            @Value("${app.scheduling-product-expiration-interval-seconds}") int schedulingProductExpirationIntervalSeconds
+            @Value("${app.scheduling-product-expiration-interval-seconds}") int schedulingProductExpirationIntervalSeconds,
+            @Value("${app.just-in-time-scheduling-enabled}") boolean justInTimeSchedulingEnabled
             ) {
+       if (!justInTimeSchedulingEnabled) {
+           return null;
+       }
         return TriggerBuilder.newTrigger().forJob(job)
                 .withIdentity("SchedulingProductExpirationTrigger")
                 .withDescription("Trigger for scheduling product expiration, triggers every minute forever")

@@ -11,4 +11,8 @@ import java.time.OffsetDateTime;
 public interface ProductRepository extends CrudRepository<Product, Long> {
     Page<Product> findByExpirationDateLessThanAndState(OffsetDateTime expirationDate, ProductState state, Pageable pageable);
 
+    Iterable<Product> findByExpirationDateLessThanAndState(OffsetDateTime expirationDate, ProductState state);
+
+    long countByExpirationDateLessThanAndState(OffsetDateTime expirationDate, ProductState state);
+
 }

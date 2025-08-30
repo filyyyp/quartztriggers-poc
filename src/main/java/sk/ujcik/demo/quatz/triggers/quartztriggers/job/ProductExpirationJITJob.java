@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.service.ProductService;
 
-import java.util.List;
-
 @Slf4j
 @Component
-public class ProductExpirationJob implements Job {
+public class ProductExpirationJITJob implements Job {
 
     @Autowired
     private ProductService productService;
