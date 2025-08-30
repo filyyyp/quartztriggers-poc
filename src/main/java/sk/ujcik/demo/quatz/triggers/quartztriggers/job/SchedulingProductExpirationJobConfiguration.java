@@ -6,6 +6,7 @@ import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,12 +29,15 @@ public class SchedulingProductExpirationJobConfiguration {
    }
 
     @Bean(name = "schedulingProductExpirationTrigger")
-    public Trigger trigger(@Qualifier("schedulingProductExpirationJobDetail") JobDetail job) {
+    public Trigger trigger(
+            @Qualifier("schedulingProductExpirationJobDetail") JobDetail job,
+            @Value("${app.scheduling-product-expiration-interval-seconds}") int schedulingProductExpirationIntervalSeconds
+            ) {
         return TriggerBuilder.newTrigger().forJob(job)
                 .withIdentity("SchedulingProductExpirationTrigger")
                 .withDescription("Trigger for scheduling product expiration, triggers every minute forever")
                 .startAt(futureDate(10, DateBuilder.IntervalUnit.SECOND))
-                .withSchedule(simpleSchedule().repeatForever().withIntervalInSeconds(60))
+                .withSchedule(simpleSchedule().repeatForever().withIntervalInSeconds(schedulingProductExpirationIntervalSeconds))
                 .build();
     }
 }

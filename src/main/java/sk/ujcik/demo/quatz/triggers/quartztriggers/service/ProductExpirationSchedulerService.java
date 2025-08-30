@@ -7,6 +7,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,8 @@ public class ProductExpirationSchedulerService {
     private final ProductService productService;
     private final Scheduler scheduler;
     private final JobDetail productExpirationJobDetail;
+    @Value("${app.schedule-triggers-for-nearest-seconds}")
+    private int scheduleTriggersForNearestSeconds;
 
     public ProductExpirationSchedulerService(
             ProductService productService,
@@ -43,7 +46,7 @@ public class ProductExpirationSchedulerService {
     @Transactional
     public void scheduleProductsForExpiration()  {
         int batchSize = 5000;
-        int expirationInSeconds = 60;
+        int expirationInSeconds = scheduleTriggersForNearestSeconds;
         OffsetDateTime expirationDate = OffsetDateTime.now().plusSeconds(expirationInSeconds);
         PageRequest pageRequest = PageRequest.of(0, batchSize, Sort.by("id"));
         Page<Product> productsWithExpiration = productService.findProductsWithExpiration(expirationDate, pageRequest);
@@ -85,4 +88,6 @@ public class ProductExpirationSchedulerService {
             throw new RuntimeException(e);
         }
     }
+
+    //TODO dopracovat aby neplanoval produkty na deaktivaciu ktore uz boli naplanovane
 }

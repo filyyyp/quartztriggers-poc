@@ -1,14 +1,12 @@
 package sk.ujcik.demo.quatz.triggers.quartztriggers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import sk.ujcik.demo.quatz.triggers.quartztriggers.service.ProductService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @SpringBootApplication
@@ -19,13 +17,17 @@ public class QuartztriggersApplication {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(ProductService productService) {
+    public CommandLineRunner commandLineRunner(
+            ProductService productService,
+            @Value("${app.max-expiration-date-for-generated-products-seconds}")
+            int maxExpirationDateForGeneratedProductsSeconds,
+            @Value("${app.number-of-generated-products}")
+            int numberOfGeneratedProducts
+    ) {
         return args -> {
             Thread.sleep(1_000);
-            int numberOfProducts = 80_000;
-//            int numberOfProducts = 10_000;
-            log.info("Generating {} products", numberOfProducts);
-            productService.generateProducts(numberOfProducts, 5 * 60);
+            log.info("Generating {} products", numberOfGeneratedProducts);
+            productService.generateProducts(numberOfGeneratedProducts, maxExpirationDateForGeneratedProductsSeconds);
             log.info("Finished generating of products");
         };
     }

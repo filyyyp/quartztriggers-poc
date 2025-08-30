@@ -11,3 +11,10 @@ from  qrtz_triggers
 WHERE
 to_timestamp(next_fire_time / 1000) < now()
 ORDER BY qrtz_triggers.next_fire_time ASC
+
+
+Problemy ktore je potrebne vyriesit
+ - zabezpecit aby sa neplanoval opakovane dalsi trigger na produkt na ktory uz je vytvoreny trigger
+ - zabezpecit aby sa neplanoval trigger na produkt na ktory sa uz odoslal trigger na spracovanie
+ - ako sa vysporiadat s viacerymi replikami vs triggre
+ - ak sa bude pouzivat jdbc pre quartz spravit custom sql script na vytahovanie triggerov (overit este implementaciu ktoru som robil tato je uz mozno performna)
