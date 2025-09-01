@@ -18,3 +18,4 @@ Problemy ktore je potrebne vyriesit
  - zabezpecit aby sa neplanoval trigger na produkt na ktory sa uz odoslal trigger na spracovanie
  - ako sa vysporiadat s viacerymi replikami vs triggre
  - ak sa bude pouzivat jdbc pre quartz spravit custom sql script na vytahovanie triggerov (overit este implementaciu ktoru som robil tato je uz mozno performna)
+
